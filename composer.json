@@ -1,0 +1,36 @@
+{
+  "name": "wherd/base",
+  "description": "PHP skeleton project",
+  "type": "template",
+  "require-dev": {
+      "kahlan/kahlan": "*",
+      "friendsofphp/php-cs-fixer": "*",
+      "phpstan/phpstan": "*"
+  },
+  "license": "MIT",
+  "autoload": {
+      "psr-4": {
+          "App\\": "src/"
+      }
+  },
+  "authors": [
+      {
+          "name": "Sérgio Leal",
+          "email": "ola@wherd.dev"
+      }
+  ],
+  "scripts": {
+      "fmt": "export PHP_CS_FIXER_IGNORE_ENV=1; php-cs-fixer fix",
+      "check": "phpstan analyse --level 8 src",
+      "test": "kahlan"
+  },
+  "require": {
+    "wherd/foundation": "^1.0",
+    "wherd/config": "^1.0",
+    "wherd/cmd": "^1.0",
+    "wherd/http": "^1.0",
+    "wherd/database": "^2.0",
+    "wherd/signal": "^1.0",
+    "wherd/cache": "^1.0"
+  }
+}

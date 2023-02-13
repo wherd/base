@@ -1,0 +1,11 @@
+*.cache
+.DS_Store
+vendor
+node_modules
+writable/**/*.php
+writable/**/*.lock
+writable/**/.touch
+writable/sessions/sess_*
+public/assets/style.css
+src/Facades/*
+

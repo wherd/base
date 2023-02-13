@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+use Wherd\Foundation\System;
+use Wherd\Cmd\Kernel;
+
+/*
+|-----------------------------------------------------
+| Register The Auto Loader
+|-----------------------------------------------------
+|
+| Simply register the autloader function so that we
+| don't have to worry about manual loading any of our
+| classes later on. It feels great to relax.
+|
+*/
+
+include __DIR__ . '/vendor/autoload.php';
+
+define('ROOT', __DIR__);
+define('WRITABLE', __DIR__ . '/writable');
+
+const CONFIG_DIR = ROOT . '/var/config';
+
+/*
+|-----------------------------------------------------
+| Bind Important Interfaces
+|-----------------------------------------------------
+|
+| Next, we need to bind some important interfaces into
+| the provider so we will be able to resolve them
+| when needed.
+|
+*/
+
+$app = new System();
+
+$app->provideMultiple([
+    'config' => new \Wherd\Config\PhpAdapter(),
+    'kernel' => new Kernel(),
+]);
+
+$config_provider = $app->providerOf('config');
+$kernel_provider = $app->providerOf('kernel');
+
+/*
+|-----------------------------------------------------
+| Load configuration file
+|-----------------------------------------------------
+|
+| Load and parse the main configuration file.
+| PHP files are used as its supported configuration file
+| type. The site configuration file is phplease.php the
+| rest is loaded as needed and managed by packages.
+|
+*/
+
+$config = $config_provider->load(CONFIG_DIR . '/system.php');
+date_default_timezone_set($config['timezone'] ?? 'Europe/London');
+
+/*
+|-----------------------------------------------------
+| Bind Custom Interfaces
+|-----------------------------------------------------
+|
+| Next, we need to bind user interfaces into the
+| provider so we will be able to resolve them when
+| needed.
+|
+*/
+
+$app->provideMultiple($config_provider->load(CONFIG_DIR . '/providers.php'));
+
+/*
+|-----------------------------------------------------
+| Load and setup routes
+|-----------------------------------------------------
+|
+| Routes handle incoming requests. The default
+| routes are loaded from the configuration file
+| but packages can also register and handle routes.
+|
+*/
+
+$kernel_provider->addHandlers($config_provider->load(CONFIG_DIR . '/cmd.php'));
+
+/*
+|-----------------------------------------------------
+| Turn On The Lights
+|-----------------------------------------------------
+|
+| This script returns the application instance. The
+| instance is given to the calling script so we can
+| separate the building of the instances from the
+| actual running of the application and sending
+| responses.
+|
+*/
+
+echo "\n", $kernel_provider->dispatch(...array_slice($argv, 1)), "\n";
